@@ -33,15 +33,19 @@
     @reset.prevent="resetNewTaskFields"
     @submit.prevent="addTask"> 
     <!-- 新規登録するタスク名 -->
-    <input type="text" v-model="newTaskTitle" class="form__text"/>
+    <input type="text" v-model="newTaskTitle"
+      ref="newTaskTitle"
+      @keyup.esc="resetNewTaskFields" 
+      class="form__text"/>
     <button type="submit">追加</button> <!-- submitボタンにする -->
     <button type="reset">キャンセル</button> <!-- リセットイベントを起動する -->
   </form>
   <!-- v-show:登録用UIを表示するボタン -->
   <button
     type="button"
-    v-show="!newTaskFieldsVisible"
-    @click="showNewTaskFields($event)">タスク追加</button>
+    v-show="!newTaskFieldsVisible" 
+    @click="showNewTaskFields($event)" 
+    ref="taskAddBtn">タスク追加</button>
 </div>
 </template>
 <script>
@@ -143,11 +147,17 @@
         console.log(event.target);
         console.log(event.type);
         this.newTaskFieldsVisible = true;
+          this.$nextTick(() => {
+            this.$refs.newTaskTitle.focus(); // テキストボックスにフォーカス
+          });
       },
       resetNewTaskFields() {
-        this.newTaskFieldsVisible = false;
         this.newTaskTitle = '';
-      }
+        this.newTaskFieldsVisible = false;
+        this.$nextTick(() => {
+          this.$refs.taskAddBtn.focus();
+        });
+      },
     }
   }
 
