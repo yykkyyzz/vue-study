@@ -5,22 +5,13 @@
   
     <div class="filter-area">
       <input v-model="titleFilter" type="text" placeholder="タスク名で絞り込む" ref="titleFilter" />
-      <label>
-        <input type="radio" v-model="doneFilter"
-         :value="DONE_FILTER.UNDONE"/>未完了
-      </label>
-      <label>
-        <input type="radio" v-model="doneFilter"
-         :value="DONE_FILTER.DONE"/>完了
-      </label>
-      <label>
-        <input type="radio" v-model="doneFilter"
-         :value="DONE_FILTER.ALL"/>すべて
-      </label>
+      <label><input type="radio" :value="DONE_FILTER.UNDONE" v-model="doneFilter" />未完了</label>
+      <label><input type="radio" :value="DONE_FILTER.DONE" v-model="doneFilter" />完了</label>
+      <label><input type="radio" :value="DONE_FILTER.ALL" v-model="doneFilter" />すべて</label>
     </div>  
     <ul class="list-tasks">
       <!--<li class="list-task" v-for="(task,index) in tasks" :key="task.id">--> <!-- v-bindなくても表示された。公式ガイドでは、v-for利用時は可能な限りkey属性を設定することを推奨しているとのこと。 --><!-- :key == v-bind:key -->
-      <li class="list-task" v-for="task in filteredTasks" :key="task.id">
+      <li class="list-task" v-for="task in tasks" :key="task.id">
           <form
             v-if="isEditingTask(task)"
             @submit.prevent="editTask"
@@ -67,8 +58,6 @@
 </div>
 </template>
 <script>
-  // /www.codegrid.net/articles/2020-vue3-2/
-  //const Todo = { //←この記述だとtasksのインスタンス作れなかった
   const DONE_FILTER = {
     DONE: true,
     UNDONE: false,
@@ -80,7 +69,7 @@
     data() {
       return {
         tasks: [],
-        // 現在の選択値を管理（初期値は未完了）
+        DONE_FILTER: readonly(DONE_FILTER),
         doneFilter: DONE_FILTER.UNDONE,
         titleFilter: '',
         newTaskFieldsVisible: false,
@@ -91,47 +80,37 @@
       };
     }, 
     created(){ 
-      fetch('http://localhost:3001/tasks')
-      .then(res => res.json())
-      .then(data => this.tasks = data)
-      .catch(err => console.log(err.messate))
-   },
+      this.read();
+    },
     mounted() { 
       //this.read()
     },
-    computed: {
-      DONE_FILTER() {
-        return readonly(DONE_FILTER);
+    watch: {
+      titleFilter() {
+        let url = 'http://localhost:3001/tasks?title='+this.titleFilter
+        this.fetchTasks(url);
       },
-      filteredTasks() {
-        // ★1 絞り込みが不要な場合は全データを返す
-        const noFilter = this.titleFilter === '' &&
-                          this.doneFilter === DONE_FILTER.ALL;
-        if (noFilter) {
-          return this.tasks;
+      doneFilter() {
+        let url = "";
+        if( this.doneFilter === DONE_FILTER.ALL){
+          url = 'http://localhost:3001/tasks';
+        }else{
+          url = 'http://localhost:3001/tasks?done='+this.doneFilter;
         }
-
-        return this.tasks.filter(task => {
-          // ★2 タスク名フィルタの判定
-          const titleMatched = this.titleFilterExp.test(task.title);
-
-          // ★3 タスク実施状態フィルタの判定
-          const doneMatched =
-            this.doneFilter === DONE_FILTER.ALL ||
-            this.doneFilter === task.done;
-
-          return titleMatched && doneMatched;
-        });
-      },
-      // ★4 タスク実施状態フィルタの正規表現オブジェクト化
-      titleFilterExp() {
-        return new RegExp(this.titleFilter);
+        this.fetchTasks(url);
       },
     },
     methods: {
       read(){
         console.log("called read")
-        fetch('http://localhost:3001/tasks')
+        fetch('http://localhost:3001/tasks?done=false')
+          .then(res => res.json())
+          .then(data => this.tasks = data)
+          .catch(err => console.log(err.messate))
+      },
+      fetchTasks(url) {
+        console.log("fetchTasks " + url);
+        fetch(url)
           .then(res => res.json())
           .then(data => this.tasks = data)
           .catch(err => console.log(err.messate))
