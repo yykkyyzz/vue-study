@@ -1,14 +1,9 @@
 {
   "tasks": [
     {
-      "id": 1,
-      "title": "野菜を買う",
-      "done": false
-    },
-    {
-      "id": 2,
       "title": "魚を買う",
-      "done": false
+      "done": true,
+      "id": 2
     },
     {
       "id": 3,
@@ -26,9 +21,9 @@
       "done": false
     },
     {
-      "id": 6,
       "title": "歩く",
-      "done": false
+      "done": true,
+      "id": 6
     },
     {
       "title": "トイレットペーパーを買う",
@@ -36,7 +31,7 @@
       "id": 7
     },
     {
-      "title": "調理酒を買う",
+      "title": "野菜を買わない",
       "done": false,
       "id": 8
     }

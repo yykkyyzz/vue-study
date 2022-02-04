@@ -4,7 +4,7 @@
     <button @click="read()">データの取得</button>
   
     <div class="filter-area">
-      <input v-model="titleFilter" type="text" placeholder="タスク名で絞り込む" />
+      <input v-model="titleFilter" type="text" placeholder="タスク名で絞り込む" ref="titleFilter" />
       <label>
         <input type="radio" v-model="doneFilter"
          :value="DONE_FILTER.UNDONE"/>未完了
@@ -20,32 +20,50 @@
     </div>  
     <ul class="list-tasks">
       <!--<li class="list-task" v-for="(task,index) in tasks" :key="task.id">--> <!-- v-bindなくても表示された。公式ガイドでは、v-for利用時は可能な限りkey属性を設定することを推奨しているとのこと。 --><!-- :key == v-bind:key -->
-      <li class="list-task" v-for="(task,index) in filteredTasks" :key="task.id">
-        <input type="checkbox" :id="['id' + index]" v-model="task.done" />
-        <label :for="['id' + index]">{{task.title}}</label>
-        <button class="btnDelete" @click="deleteTask(task.id)">削除</button>
+      <li class="list-task" v-for="task in filteredTasks" :key="task.id">
+          <form
+            v-if="isEditingTask(task)"
+            @submit.prevent="editTask"
+            @reset.prevent="hideEditingTaskFields"
+            class="form"
+          >
+            <input
+              v-model="editingTaskTitle" type="text" @keyup.esc="hideEditingTaskFields" ref="editingTaskTitle" class="input_text" 
+            />
+            <button type="submit">確定</button>
+            <button type="reset">キャンセル</button>
+          </form>
+          <template v-else>
+            <input type="checkbox" v-model="task.done" @change="changeDone(task)" />
+            <span>{{task.title}}</span>
+            <button @click="showEditingTaskFields(task)" :ref="getEditBtnId(task.id)">編集</button>
+            <button @click="deleteTask(task.id)">削除</button>
+          </template>
+        </li>
+      <li class="list-buttons">
+        <form
+          v-show="newTaskFieldsVisible"
+          @submit.prevent="addTask"
+          @reset.prevent="resetNewTaskFields"
+        >
+          <input
+            v-model="newTaskTitle"
+            ref="newTaskTitle"
+            @keyup.esc="resetNewTaskFields"
+            type="text"
+            placeholder="新しいタスク"
+            class="input_text"
+          />
+          <button type="submit">追加</button>
+          <button type="reset">キャンセル</button>
+        </form>
+        <button @click="showNewTaskFields" v-show="!newTaskFieldsVisible" ref="taskAddBtn">
+          タスク追加
+        </button>
       </li>
     </ul>
   </div>
   <!-- v-show:登録用UI -->
-  <form
-    v-show="newTaskFieldsVisible"
-    @reset.prevent="resetNewTaskFields"
-    @submit.prevent="addTask"> 
-    <!-- 新規登録するタスク名 -->
-    <input type="text" v-model="newTaskTitle"
-      ref="newTaskTitle"
-      @keyup.esc="resetNewTaskFields" 
-      class="form__text"/>
-    <button type="submit">追加</button> <!-- submitボタンにする -->
-    <button type="reset">キャンセル</button> <!-- リセットイベントを起動する -->
-  </form>
-  <!-- v-show:登録用UIを表示するボタン -->
-  <button
-    type="button"
-    v-show="!newTaskFieldsVisible" 
-    @click="showNewTaskFields($event)" 
-    ref="taskAddBtn">タスク追加</button>
 </div>
 </template>
 <script>
@@ -65,15 +83,21 @@
         // 現在の選択値を管理（初期値は未完了）
         doneFilter: DONE_FILTER.UNDONE,
         titleFilter: '',
+        newTaskFieldsVisible: false,
         newTaskTitle: '',
-        newTaskFieldsVisible: false
+        editingTaskFieldsVisible: false,
+        editingTaskTitle: '',
+        editingTask: '',
       };
     }, 
-    // created(){ これだとデータが読み込めなかった
-    //   this.read()
-    // },
+    created(){ 
+      fetch('http://localhost:3001/tasks')
+      .then(res => res.json())
+      .then(data => this.tasks = data)
+      .catch(err => console.log(err.messate))
+   },
     mounted() { 
-      this.read()
+      //this.read()
     },
     computed: {
       DONE_FILTER() {
@@ -143,20 +167,74 @@
         // 登録用UIの非表示化と、新規登録用のタスク名のクリア
         this.resetNewTaskFields();
       },
-      showNewTaskFields(event) {
-        console.log(event.target);
-        console.log(event.type);
-        this.newTaskFieldsVisible = true;
-          this.$nextTick(() => {
-            this.$refs.newTaskTitle.focus(); // テキストボックスにフォーカス
-          });
+      isEditingTask(task) {
+        return this.editingTaskFieldsVisible && this.editingTask.id === task.id;
       },
-      resetNewTaskFields() {
+      getEditBtnId(taskId) {
+        return `taskEditBtn${taskId}`;
+      },
+
+      showNewTaskFields() {
+        this.newTaskFieldsVisible = true;
+        this.$nextTick(() => {
+          this.$refs.newTaskTitle.focus();
+        });
+      },
+      resetNewTaskFields(event) {
         this.newTaskTitle = '';
         this.newTaskFieldsVisible = false;
         this.$nextTick(() => {
           this.$refs.taskAddBtn.focus();
         });
+      },
+      showEditingTaskFields(task) {
+        this.editingTask = task;
+        this.editingTaskTitle = task.title;
+        this.editingTaskFieldsVisible = true;
+
+        this.$nextTick(() => {
+          this.$refs.editingTaskTitle[0].select();
+        });
+      },
+      hideEditingTaskFields() {
+        this.editingTaskFieldsVisible = false;
+        const editBtnId = this.getEditBtnId(this.editingTask.id);
+        this.$nextTick(() => {
+          this.$refs[editBtnId][0].focus();
+        });
+      },
+      changeDone(task) {
+        fetch(`http://localhost:3001/tasks/${task.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            'title': task.title,
+            'done': task.done
+          })
+        })
+        .then( () =>  { 
+          this.read()
+        }) 
+      },
+      editTask() {
+        this.editingTask.title = this.editingTaskTitle;
+        this.hideEditingTaskFields();
+
+        fetch(`http://localhost:3001/tasks/${this.editingTask.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            'title': this.editingTask.title,
+            'done': this.editingTask.done
+          })
+        })
+        .then( () =>  { 
+          this.read()
+        }) 
       },
     }
   }
@@ -172,6 +250,7 @@
 .list-tasks {
   width: 40%;
   margin:40px auto;
+  list-style: none;
 }
 .list-task {
   text-align: left;
@@ -180,12 +259,37 @@
   justify-content: flex-start;
   margin: 5px 0;
 }
-.list-task label {
-flex:1 0 auto;
+.list-task span {
+  display: inline-block;
+  width: 70%;
+  margin: 0 10px 0
 }
+.list-task button {
+  margin: 0 5px;
+}
+.list-task label {
+  flex:1 0 auto;
+}
+.list-buttons {
+  margin: 20px 0 0;
+}
+.list-buttons button {
+  margin: 0 5px;
+}
+
+.form {
+  width: 100%;
+}
+.input_text {
+  width: 60%;
+  padding: 5px;
+  margin-right: 20px;
+}
+
 .form__text {
   padding: 5px;
   width: 300px;
   margin-right: 20px;
 }
+
 </style>
