@@ -7,21 +7,25 @@
 </template>
 
 <script>
+import ImageResizer from '../components/14/ImageResizer.vue';
+import ImageSelector from '../components/14/ImageSelector.vue';
+import Counter from '../models/14/Counter.js';
+import { readonly } from 'vue';
 
-import CounterPanel from '../components/13/CounterPanel.vue';
-import Counter from '../assets/13/js/Counter.js';
-const imageList = ['/assets/images/360192black.png','/assets/images/360192yellow.png'];
-const makeImageResizerToolsCtx = (...) => {...};
-const makeImageResizerPreviewCtx = (...) => {...};
-const makeImageSelectorCtx = (...) => {...};
+const imageList = [
+  './assets/images/360192black.png',
+  './assets/images/360192yellow.png',
+  './assets/images/438292bluefff.png',
+  './assets/images/438292pinkfff.png'
+];
 
 const makeImageResizerToolsCtx = (widthCounter, heightCounter) => {
   return {
     get widthCounter() {
-      return Vue.readonly(widthCounter); // ★変更不可にして公開
+      return readonly(widthCounter); // ★変更不可にして公開
     },
     get heightCounter() {
-      return Vue.readonly(heightCounter); // ★変更不可にして公開
+      return readonly(heightCounter); // ★変更不可にして公開
     },
     updateWidth(width) {
       widthCounter.count = width;
@@ -36,18 +40,45 @@ const makeImageResizerToolsCtx = (widthCounter, heightCounter) => {
   };
 };
 
+const makeImageResizerPreviewCtx = (widthCounter, heightCounter, imageState) => {
+  return {
+    get width() {
+      return widthCounter.count; // ★カウント数のみを公開
+    },
+    get height() {
+      return heightCounter.count; // ★カウント数のみを公開
+    },
+    get selectedImageSrc() {
+      return imageState.selectedImageSrc; // ☆状態データの参照
+    },
+    showImageSelector() {
+      imageState.imageSelectorVisible = true; // ☆状態データの更新
+    },
+  };
+};
+
+const makeImageSelectorCtx = (imageList, imageState) => {
+  return {
+    get imageList() {
+      return Vue.readonly(imageList); // ★変更不可にして公開
+    },
+    updateSelectedImageSrc(imageSrc) {
+      imageState.selectedImageSrc = imageSrc; // 選択中画像URLの変更
+    },
+    hideImageSelector() {
+      imageState.imageSelectorVisible = false; // ダイアログの非表示
+    },
+  };
+};
+
 export default {
   
   components: {
-    CounterPanel,
+    ImageResizer,
+    ImageSelector,
   },
   data() {
-    const options = {
-      min: 50,
-      max: 1000,
-      step: 50,
-    };
-    
+    const options = { min: 50, max: 1000, step: 50 };
     return {
       widthCounter: new Counter(200, options),
       heightCounter: new Counter(150, options),
@@ -55,49 +86,25 @@ export default {
         selectedImageSrc: imageList[0],
         imageSelectorVisible: false,
       },
+      bar: false,
     };
   },
   provide() {
     const { widthCounter, heightCounter, imageState } = this;
 
+    const imageResizerToolsCtx = makeImageResizerToolsCtx(widthCounter, heightCounter);
+    const imageResizerPreviewCtx = makeImageResizerPreviewCtx(
+      widthCounter,
+      heightCounter,
+      imageState,
+    );
+    const imageSelectorCtx = makeImageSelectorCtx(imageList, imageState);
+
     return {
-      imageResizerToolsCtx: makeImageResizerToolsCtx(
-        widthCounter, heightCounter
-      ),
-      imageResizerPreviewCtx: makeImageResizerPreviewCtx(
-        widthCounter, heightCounter, imageState,
-      ),
-      imageSelectorCtx: makeImageSelectorCtx(
-        imageState, imageList
-      ),
-    }
-  },
-  watch: {
-    alertVisible(visible) {
-      if(visible) {
-        setTimeout(() => (this.alertVisible = false), 1500);
-      }
-    }
-  },
-  methods: {
-    changeWidth(width) {
-      if( width < this.heightCounter.count) {
-        this.alertVisible = true;
-        return;
-      }
-      this.widthCounter.count = width;
-    },
-    changeHeight(height) {
-      if( this.widthCounter.count < height) {
-        this.alertVisible = true;
-        return;
-      }
-      this.heightCounter.count = height;
-    },
-    clearCount() {
-      this.widthCounter.count = this.widthCounter.initialCount;
-      this.heightCounter.count = this.heightCounter.initialCount;
-    },
+      imageResizerToolsCtx,
+      imageResizerPreviewCtx,
+      imageSelectorCtx,
+    };
   },
   
 }
