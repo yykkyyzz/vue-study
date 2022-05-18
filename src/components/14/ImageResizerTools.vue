@@ -44,4 +44,13 @@ export default {
   },
 }
 </script>
+<style scoped>
+button {
+  margin: 0 0 0 15px;
+  width: 100px;
+  background-color: #eee;
+  border: 1px solid #333;
+  border-radius: 5px;
+}
+</style>
 

@@ -1,7 +1,7 @@
 <template>
     <div class="imageResizerPreview">
-      <button @click="changeImage">CHANGE IMAGE</button>
-      <img :src="ctx.selectedImageSrc" :width="ctx.width" :height="ctx.height"/>
+      <div><img :src="ctx.selectedImageSrc" :width="ctx.width" :height="ctx.height"/></div>
+      <div><button @click="changeImage">CHANGE IMAGE</button></div>
     </div>
 </template>
 
@@ -21,4 +21,9 @@ export default {
   },
 }
 </script>
+<style scoped>
+button {
+  margin: 10px 0 0;
+}
+</style>
 

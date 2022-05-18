@@ -60,7 +60,7 @@ const makeImageResizerPreviewCtx = (widthCounter, heightCounter, imageState) => 
 const makeImageSelectorCtx = (imageList, imageState) => {
   return {
     get imageList() {
-      return Vue.readonly(imageList); // ★変更不可にして公開
+      return readonly(imageList); // ★変更不可にして公開
     },
     updateSelectedImageSrc(imageSrc) {
       imageState.selectedImageSrc = imageSrc; // 選択中画像URLの変更

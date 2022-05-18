@@ -1,5 +1,5 @@
 <template>
-    <div>
+  <div>
       <ImageResizerTools/>
       <hr/>
       <ImageResizerPreview/>
@@ -17,4 +17,8 @@ export default {
   },
 }
 </script>
-
+<style scoped>
+.imageResizer {
+  position: relative;
+}
+</style>

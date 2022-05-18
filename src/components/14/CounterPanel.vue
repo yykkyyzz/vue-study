@@ -36,4 +36,20 @@ export default {
   },
 }
 </script>
+<style scoped>
+button {
+  width: 40px;
+  height: 20px;
+  background-color: #eee;
+  border: 1px solid #333;
+  border-radius: 5px;
+  margin: 0 10px 10px;
+}
+input[type='number'] {
+  width: 100px;
+  height: 20px;
+  border: 1px solid #333;
+  border-radius: 5px;
+}
+</style>
 
