@@ -8,7 +8,7 @@
 <script>
 
 export default {
-  name: 'ImageResizerPreview',
+  
   inject: ['imageResizerPreviewCtx'],
   computed: {
     ctx() {

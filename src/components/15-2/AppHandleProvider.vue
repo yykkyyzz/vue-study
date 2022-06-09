@@ -6,7 +6,9 @@
 </template>
 
 <script>
-import { DialogHandleProvider } from './DialogHandleProvider.vue';
+import Counter from '../../models/14/Counter.js';
+import DialogHandleProvider from './DialogHandleProvider.vue';
+import { readonly } from 'vue';
 
 const imageList = [
   './assets/images/360192black.png',
@@ -18,10 +20,10 @@ const imageList = [
 const makeImageResizerToolsCtx = (widthCounter, heightCounter) => {
   return {
     get widthCounter() {
-      return Vue.readonly(widthCounter);
+      return readonly(widthCounter);
     },
     get heightCounter() {
-      return Vue.readonly(heightCounter);
+      return readonly(heightCounter);
     },
     updateWidth(width) {
       widthCounter.count = width;
@@ -68,11 +70,13 @@ const makeImageSelectorCtx = (imageList, imageState, dialogHandleCtx) => {
 };
 
 export default {
-  name: 'AppHandleProvider',
-  components: {
+
+   components: {
     DialogHandleProvider,
   },
+
   inject: ['dialogHandleCtx'],
+
   data() {
     const options = { min: 50, max: 1000, step: 50 };
     return {

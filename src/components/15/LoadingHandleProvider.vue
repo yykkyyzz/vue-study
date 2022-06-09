@@ -1,5 +1,5 @@
 <template>
-    <slot/>
+    <slot :dialog-visible="state.loadingVisible"/>
 </template>
 
 <script>

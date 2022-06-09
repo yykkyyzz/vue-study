@@ -22,7 +22,7 @@
 import CounterPanel from './CounterPanel.vue';
 
 export default {
-  name: 'ImageResizerTools',
+
   components: {
     CounterPanel,
   },

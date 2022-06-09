@@ -14,15 +14,14 @@
 </template>
 
 <script>
-import { DialogHandleProvider } from './DialogHandleProvider.vue';
-import { AppHandleProvider } from './AppHandleProvider.vue';
-import { ImageResizer } from './ImageResizer.vue';
-import { ImageResizerTools } from './ImageResizerTools.vue';
-import { ImageResizerPreview } from './ImageResizerPreview.vue';
-import { ImageSelector } from './ImageSelector.vue';
+import DialogHandleProvider from '../components/15-2/DialogHandleProvider.vue';
+import AppHandleProvider from '../components/15-2/AppHandleProvider.vue';
+import ImageResizer from '../components/15-2/ImageResizer.vue';
+import ImageResizerTools from '../components/15-2/ImageResizerTools.vue';
+import ImageResizerPreview from '../components/15-2/ImageResizerPreview.vue';
+import ImageSelector from '../components/15-2/ImageSelector.vue';
 
-
-export const App = {
+export default {
 
   components: {
     DialogHandleProvider,
@@ -30,8 +29,8 @@ export const App = {
     ImageResizer,
     ImageResizerTools,
     ImageResizerPreview,
-    ImageSelector
-  },
+    ImageSelector,
+  }
   
 }
 

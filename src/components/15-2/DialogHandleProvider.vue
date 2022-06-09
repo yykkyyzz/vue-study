@@ -7,7 +7,7 @@
 
 <script>
 
-export default DialogHandleProvider = {
+export default {
   
   data() {
     return {
@@ -17,7 +17,7 @@ export default DialogHandleProvider = {
     };
   },
   provide() {
-    const { state } = this;
+    const  state  = this;
     return {
       dialogHandleCtx: {
         get dialogVisible() {

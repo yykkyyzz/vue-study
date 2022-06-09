@@ -8,7 +8,6 @@
 import Counter from '../../models/14/Counter.js';
 
 export default {
-  name: 'CounterPanel',
   props: {
     counter: {
       type: Counter,

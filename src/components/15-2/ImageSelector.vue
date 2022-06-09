@@ -9,7 +9,6 @@
 
 <script>
 export default {
-  name: 'ImageSelector',
   inject: ['imageSelectorCtx'],
   computed: {
     ctx() {
