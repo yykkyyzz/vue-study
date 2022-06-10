@@ -1,15 +1,23 @@
 <template>
       <div class="imageSelector">
       <p>click image</p>
-      <button v-for="imageSrc in ctx.imageList" @click="changeSelectedImage(imageSrc)">
-        <img :src="imageSrc"/>
-      </button>
+      <ul>
+        <li v-for="imageSrc in ctx.imageList">
+          <button  @click="changeSelectedImage(imageSrc)">
+            <img :src="imageSrc"/>
+          </button>
+        </li>
+      </ul>
     </div>
 </template>
 
 <script>
 export default {
   inject: ['imageSelectorCtx'],
+  mounted() { 
+    console.log('mounted: ImageSelector');
+  },
+
   computed: {
     ctx() {
       return this.imageSelectorCtx;
@@ -17,6 +25,7 @@ export default {
   },
   methods: {
     changeSelectedImage(imageSrc) {
+      
       this.ctx.updateSelectedImageSrc(imageSrc);
       this.ctx.hideImageSelector();
     },
@@ -25,10 +34,10 @@ export default {
 </script>
 <style scoped>
 .imageSelector {
-  width: 80%;
-  height: 50%;
+  width: 100%;
+  height: 30%;
   position: fixed;
-  top: 50%;
+  bottom: 0;
   left: 50%;
   transform: translate(-50%,-50%);
   background-color: #eee;

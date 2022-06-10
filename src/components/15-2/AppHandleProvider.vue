@@ -50,20 +50,25 @@ const makeImageResizerPreviewCtx = (widthCounter, heightCounter, imageState, dia
       return imageState.selectedImageSrc;
     },
     showImageSelector() {
+      console.log('called showImageSelector: AppHandleProvider');
       dialogHandleCtx.showDialog();
     },
   };
 };
 
 const makeImageSelectorCtx = (imageList, imageState, dialogHandleCtx) => {
+  
   return {
     get imageList() {
-      return Vue.readonly(imageList);
+      console.log('AppHandleProvider get ImageList:' + imageList);
+      return readonly(imageList);
     },
     updateSelectedImageSrc(imageSrc) {
+      console.log('called updateSelectedImageSrc: AppHandleProvider');
       imageState.selectedImageSrc = imageSrc;
     },
     hideImageSelector() {
+      console.log('called hideImageSelector: AppHandleProvider');
       dialogHandleCtx.hideDialog();
     },
   };
@@ -87,6 +92,10 @@ export default {
       },
     };
   },
+  mounted() { 
+    console.log('mounted: AppHandleProvider');
+  },
+
   provide() {
     const { widthCounter, heightCounter, imageState, dialogHandleCtx } = this;
 

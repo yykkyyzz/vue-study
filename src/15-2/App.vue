@@ -1,13 +1,13 @@
 <!-- "Standard" way of doing things -->
 <template>
   <div>
-      <DialogHandleProvider v-slot="{dialogVisible}">
+      <DialogHandleProvider v-slot="{foo}">
       <AppHandleProvider>
         <ImageResizer>
           <template v-slot:tools><ImageResizerTools/></template>
           <template v-slot:preview><ImageResizerPreview/></template>
         </ImageResizer>
-        <ImageSelector v-if="dialogVisible"/>
+        <ImageSelector v-if="foo"/>
       </AppHandleProvider>
     </DialogHandleProvider>
   </div>

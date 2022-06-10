@@ -15,6 +15,10 @@ export default {
     },
   },
   emits: ['changeCount'],
+  mounted() { 
+  console.log('mounted: CounterPanel');
+},
+
   computed: {
     count: {
       get() {

@@ -10,6 +10,10 @@
 export default {
   
   inject: ['imageResizerPreviewCtx'],
+  mounted() { 
+    console.log('mounted: imageResizerPreview');
+  },
+
   computed: {
     ctx() {
       return this.imageResizerPreviewCtx;
@@ -17,6 +21,7 @@ export default {
   },
   methods: {
     changeImage() {
+      console.log('called changeImage: imageResizerPreview');
       this.ctx.showImageSelector();
     },
   },

@@ -32,6 +32,10 @@ export default {
       return this.imageResizerToolsCtx;
     },
   },
+  mounted() { 
+    console.log('mounted: imageResizerTools');
+  },
+
   methods: {
     changeWidth(width) {
       this.ctx.updateWidth(width);
